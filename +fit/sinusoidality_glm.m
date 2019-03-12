@@ -1,4 +1,4 @@
-function [phase_of_peak, amplitude, y_offset, start_phase] = sinusoidality_fit(x, y)
+function [peak_phase, amplitude, offset, trace, gm] = sinusoidality_fit(x, y)
 % x should be in radians, i.e. pi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % calculations
@@ -20,13 +20,11 @@ gopt.Upper      = [Inf Inf +pi];
 gm              = fit(x, y, g, gopt);
 %y_hat           = fit_foo(x, gm.y_offset, gm.amplitude, gm.start_phase);
 
-tmp_x           = -pi:0.0001:pi;
-tmp_y           = fit_foo(tmp_x, gm.y_offset, gm.amplitude, gm.start_phase);
-[~, idx]        = sort(tmp_y, 'descend');
+tmp_x           = [0:0.001:2*pi];
+trace           = fit_foo(tmp_x, gm.y_offset, gm.amplitude, gm.start_phase);
+[~, idx]        = sort(trace, 'descend');
 
-phase_of_peak   = tmp_x(idx(1));
-amplitude       = gm.amplitude;
-y_offset        = gm.y_offset;
-start_phase     = gm.start_phase;
-
+peak_phase      = rad2deg(tmp_x(idx(1)));
+amplitude       = gm.amplitude*2;
+offset          = gm.y_offset;
 end
