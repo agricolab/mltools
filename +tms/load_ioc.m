@@ -42,7 +42,7 @@ function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)
     warning off
     curdir = pwd;
     cd ([fileparts(mfilename('fullpath')), filesep,'lz'])
-    load(dataset);
+    load(dataset, 'obj');
     cd (curdir);
     warning on
     
@@ -70,7 +70,7 @@ function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)
 
     %% Cut MEP traces
     % calculate how many stimuli were applied
-    Niterations = obj.tms_settings.mep_iterations ;
+    Niterations = obj.tms_settings.mep_iterations;
     Nintensities = length(obj.tms_settings.io_range);
     NPeaks = Niterations * Nintensities;  
     % detect trigger onset
@@ -80,7 +80,7 @@ function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)
                                 'MinPeakDistance',Fs.*0.8,...
                                 'NPeaks', NPeaks);
     if length(locs) ~= NPeaks
-        throw(MException('PKS:NUM','Not enough peaks found'))
+        throw(MException('PKS:NUM','Not enough triggers found'))
     end
     % cut epochs
     epoch = [];   
@@ -100,8 +100,9 @@ function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)
     Lat = [];
     Vpp = [];
     Raw = [];
-    rejects = false;
-    for trl = 1 : size(epoch,2)
+    fprintf('%s', '|')
+    for trl = 1 : size(epoch,2)    
+
         response    = epoch(pick, trl);        
         [~, plat]  = max(response);
         [~, tlat]  = min(response);
@@ -113,19 +114,19 @@ function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)
         Lat(trl)    = mean([plat, tlat]);
         Vpp(trl)    = range(response);
         baseline    = epoch(1:pre - (5*ms_sample), trl);
-        if range(baseline) > args.preactivated
-            if ~rejects
-                rejects = true;
-            end
-            fprintf(' %.0f', trl)
+        if max(abs(baseline)) > args.preactivated
+            fprintf('%s', 'r')
             Vpp(trl) = NaN;
             Lat(trl) = NaN;
             Raw(:, trl) = NaN(size(epoch,1), 1);
-        end        
+        else
+            fprintf('%s', '-')
+        end                
+        if mod(trl, Niterations)==0
+            fprintf('%s', '|')
+        end
     end
-    if rejects
-        fprintf('.')
-    end
+    
     Lat = reshape((10+(Lat/5)),Niterations,Nintensities);
     Lat = Lat(:,switcher);
     Vpp = reshape(Vpp,Niterations,Nintensities);
