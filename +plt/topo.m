@@ -21,7 +21,7 @@ args = struct('scale', [-max(max(abs(z))),max(max(abs(z)))],...
               'threshold', Inf,...
               'markersize', 12,...
               'resolution', 200,...
-              'interpolmode', 0,...
+              'interpol', 0,...
               'cbar',0,...
               'hilite',0,...
               'interpolwindow', mean(sqrt(sum((loc).^2,2))),...
@@ -37,9 +37,9 @@ else
     args.hi_idx = zeros(size(loc,1),1);
     args.hi_idx(hilite) = true;
 end
-if length(args.scale) == 1, args.scale = [min([args.scale, -args.scale]) max([args.scale, -args.scale])]; end
-
-
+if length(args.scale) == 1
+    args.scale = [min([args.scale, -args.scale]) max([args.scale, -args.scale])];
+end
 
 [~,m] = size(args.loc);
 if m == 2
@@ -57,26 +57,25 @@ Z       = griddata(x,y,z,X,Y,'nearest');
 HI      = griddata(x,y,args.hi_idx,X,Y,'nearest');
 a       = fix(args.resolution * args.interpolwindow); 
 a       = a+mod(a,2);
-if args.interpolmode == 1    
+if args.interpol  
     kernel = gausswin(a)*gausswin(a)';
     kernel = kernel./sum(sum(kernel));    
     Z = convn(Z,kernel,'same');   
 end
 
 % Take data within head
-
-rmax=1.02*max(sqrt(x.^2+y.^2));
-mask = (sqrt(X.^2+Y.^2) <= rmax);
-Z(mask == 0) = NaN;
-HI(mask == 0) = NaN;
+rmax            = 1.02*max(sqrt(x.^2+y.^2));
+mask            = (sqrt(X.^2+Y.^2) <= rmax);
+Z(mask == 0)    = NaN;
+HI(mask == 0)   = NaN;
 
 % plot stuff
 cla  
 surface(X,Y,zeros(size(Z)),Z,'edgecolor','none');shading interp;
 hold on
-if any(any(abs(Z) > args.threshold))
-    contour(X,Y,abs(Z) > args.threshold,1,...
-            'color',[.1 .1 .1]+0,'linewidth', 4);
+if any(any(abs(Z) >= args.threshold))
+    contour(X,Y,abs(Z) >= args.threshold, 1,...
+            'color',[.1 .1 .1]+0,'linewidth', 2);
 end
 if any(args.hi_idx)
     contour(X,Y,HI > 0, 1,...

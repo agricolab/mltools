@@ -28,7 +28,7 @@ while true
     cfg.badchannel      = unique(bad_channel);
     cfg.neighbours      = chan.neighbours; %find neighbours
     cfg.elec            = chan.elec;
-    data              = ft_channelrepair(cfg, data); %reconstruct bad channels
+    data                = ft_channelrepair(cfg, data); %reconstruct bad channels
 end   
 interp = data;
 

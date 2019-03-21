@@ -1,4 +1,4 @@
-%% function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)   )
+%% function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)
 %
 % Args
 % ----  
@@ -38,12 +38,13 @@
 %
 % written by rgugg 
 function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)   
-    % we need lz_TMS_v3.m in the path to load the file
-    addpath('/media/rgugg/tools/matlab/TMS_toolbox/cortical_measurements')
-    
+
     % turn of warning, as we cant load all objects in mat
     warning off
     curdir = pwd;
+    % we need lz_TMS_v3.m in the path to load the file
+    % therefore i siwtch my working directory momentarily 
+    % to where this are stored
     cd ([fileparts(mfilename('fullpath')), filesep,'lz'])
     load(dataset);
     cd (curdir);
@@ -146,8 +147,9 @@ function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)
             Occ = zeros(1, size(epoch,2));
             Lat = NaN(1, size(epoch,2));
             Dur = NaN(1, size(epoch,2));
+            th  = (blm + args.threshold*bls);
             for trix = 1 : size(epoch,2)
-                [b,L,n] = bwboundaries(response(:,trix) > (blm + args.threshold*bls));
+                [b,L,n] = bwboundaries(response(:,trix) > th);
                 if isempty(n) || n == 0
                     continue;
                 end
