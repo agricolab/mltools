@@ -35,7 +35,13 @@
 % tip
 % ---
 % requires the corresponding lz_TMS_v2-4.m in path
-%
+
+% changelog
+% -------
+% 21.03.19: switch workdir to have object code in path
+% 19.03.19: created documentation
+
+
 % written by rgugg 
 function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)   
 

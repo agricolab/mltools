@@ -31,11 +31,11 @@
 %
 % written by rgugg 
 %
-% changes
+% changelog
 % -------
-% 19.03.15: created documentation
-% 19.03.15: added sigmoidal fit
-% 19.03.15: added baseline rejection based on thresholding
+% 19.03.19: created documentation
+% 19.03.19: added sigmoidal fit
+% 19.03.19: added baseline rejection based on thresholding
 %
 function [Vpp, Lat, Raw, parms] = load_ioc(dataset, varargin)     
     % turn of warning, as we cant load all objects in mat
