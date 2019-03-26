@@ -37,7 +37,6 @@ function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y,
 
     
     args = struct('peak','analytical',...
-                  'freq', [],...
                   'nanaction','average');
     for pair = reshape(varargin, 2, [])
         args.(pair{1}) = pair{2};
@@ -87,10 +86,5 @@ function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y,
     pfit        = fcdf(f, length(y)-1, length(y)-1, 'upper');
     pval        = cat(1, model.Coefficients.pValue(1:3), pfit); %offset, amplitude, phase, versus_const
     model       =  struct('b', b, 'foo', foo);
-    
-    if ~isempty(args.freq)
-        model.time_to_peak_in_ms = 1000*peak_phase/(360*args.freq);
-    end
-    
     
 end
