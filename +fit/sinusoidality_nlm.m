@@ -33,11 +33,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y, varargin)
 
-    args = struct('peak','analytical', 'freq', []);
+    
+
+    
+    args = struct('peak','analytical',...
+                  'freq', [],...
+                  'nanaction','average');
     for pair = reshape(varargin, 2, [])
         args.(pair{1}) = pair{2};
     end          
 
+    remnan = isnan(y);
+    if strcmpi(args.nanaction, 'average')        
+        y(remnan) = nanmean(y);
+    elseif strcmpi(args.nanaction, 'remove')
+        y(remnan) = [];
+        x(remnan) = [];
+    else
+        throw(MException('ARG:NAN',sprintf('nanaction %s is not implementend', args.nanaction)))
+    end
+    
     B0 = mean(y);
     B1 = range(y)/2;
     B2 = 0;
