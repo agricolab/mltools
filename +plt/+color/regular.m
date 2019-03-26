@@ -1,4 +1,4 @@
-function cmap = regular(position)
+function cmap = regular(position, varargin)
     cmap = [0.00,0.45,0.74;...
             0.85,0.33,0.10;...
             0.93,0.69,0.13;...
@@ -13,5 +13,15 @@ function cmap = regular(position)
     elseif isnumeric(position)
         cmap = cmap(position,:);
     end
+    args = struct('output', 'mat');
+    for pair = reshape(varargin,2,[])
+        args.(pair{1}) = pair{2};
+    end
     
+    if strcmpi(args.output, 'cellarray') || strcmpi(args.output, 'ca')
+        for ix = 1 : size(cmap,1)
+            tmp{ix} = cmap(ix,:);
+        end
+        cmap = tmp;
+    end
 end

@@ -8,5 +8,5 @@ function scatterchange(X)
     for ix = 1 : 2
         plt.scatterbox(ix, X(:,ix),plt.color.regular(ix));
     end
-
+    
 end
