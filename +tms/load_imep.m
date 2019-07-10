@@ -55,8 +55,7 @@ function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)
     load(dataset);
     cd (curdir);
     warning on
-    
-    
+
     args = struct('channel', 'EDC_L',...
                   'tracer', obj.ampSettings.ChanNumb + 1,...
                   'NPeaks', obj.tms_settings.imep_runs*obj.tms_settings.imep_iterations,...
@@ -71,14 +70,34 @@ function [Vpp, Lat, Occ, Dur] = load_imep(dataset, varargin)
     pre = ceil(100*Fs/1000);
     post = ceil(100*Fs/1000);
     channel_labels = obj.ampSettings.ChanNames;
-    
-    chan_pick = find(ismember(channel_labels, args.channel));
-    if isempty(chan_pick)
-        throw (MException('iMEP:CHAN', ...
-        'Channel not found. Available: %s ', strjoin(channel_labels,', ')))
+    if ischar(args.channel)
+        chan_pick = find(ismember(channel_labels, args.channel));
+        if isempty(chan_pick)
+            throw (MException('iMEP:CHAN', ...
+            'Channel not found. Available: %s ', strjoin(channel_labels,', ')))     
+        end
+    elseif iscell(args.channel)
+        if length(args.channel) >2
+            throw (MException('iMEP:CHAN', "You can select at most 2 channels"))
+        end
+        chan_pick = NaN(length(args.channel),1);
+        for cix = 1 : length(args.channel)
+            cp = find(ismember(channel_labels, args.channel{cix}));            
+            if isempty(cp)
+                throw (MException('iMEP:CHAN', ...
+                'Channel %s not found. Available: %s ', ...
+                 args.channel{cix}, strjoin(channel_labels,', ')))     
+            end
+            chan_pick(cix) = cp;
+        end        
     end
     
+        
     signal = obj.dataEEGEMG(:,chan_pick);
+    %bipolarize if necessary
+    if size(signal,2) > 1 
+        signal = diff(signal,[],2);
+    end
     signal = padarray(signal, pre, 0);
     tracer = obj.dataEEGEMG(:,args.tracer);
     tracer = padarray(tracer, pre, 0);

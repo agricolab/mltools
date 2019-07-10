@@ -1,6 +1,6 @@
 function corr(r, p)
     for ix = 1 : length(r)
-        fprintf('r= %+.3f   ', p(ix))
+        fprintf('r= %+.3f   ', r(ix))
     end
     fprintf('\n')
     for ix = 1 : length(r)

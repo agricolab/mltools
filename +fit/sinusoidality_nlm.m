@@ -33,9 +33,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y, varargin)
 
-    
-
-    
     args = struct('peak','analytical',...
                   'nanaction','average');
     for pair = reshape(varargin, 2, [])
@@ -45,12 +42,18 @@ function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y,
     remnan = isnan(y);
     if strcmpi(args.nanaction, 'average')        
         y(remnan) = nanmean(y);
-    elseif strcmpi(args.nanaction, 'remove')
+    elseif strcmpi(args.nanaction, 'regularize')
         y(remnan) = [];
         x(remnan) = [];
+        if length(x) <= 3 || var(x) == 0 %over parametrized -> expand and regularize
+            x = cat(1, x, x);
+            y = cat(1, y, y);
+            y = y + normrnd(0, std(y)*.1, size(y));
+        end
     else
         throw(MException('ARG:NAN',sprintf('nanaction %s is not implementend', args.nanaction)))
     end
+    
     
     B0 = mean(y);
     B1 = range(y)/2;
@@ -85,6 +88,6 @@ function  [offset, amplitude, peak_phase, pval, model] = sinusoidality_nlm(x, y,
     f           = var_const./var_fit;
     pfit        = fcdf(f, length(y)-1, length(y)-1, 'upper');
     pval        = cat(1, model.Coefficients.pValue(1:3), pfit); %offset, amplitude, phase, versus_const
-    model       =  struct('b', b, 'foo', foo);
+    model       =  struct('b', b, 'foo', foo, 'F', f, 'dof', length(y)-2);
     
 end

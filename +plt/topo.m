@@ -25,7 +25,7 @@ args = struct('scale', [-max(max(abs(z))),max(max(abs(z)))],...
               'cbar',0,...
               'hilite',0,...
               'interpolwindow', mean(sqrt(sum((loc).^2,2))),...
-              'tit','');
+              'title','');
           
 args.loc = loc;          
 for pair = reshape(varargin, 2, [])
@@ -99,7 +99,7 @@ if args.cbar==1
   h = colorbar;set(h,'fontweight','bold')
 end
 
-annotation('textbox','position',[0 0 1 1],'edgecolor','None','HorizontalAlignment','center','string',args.tit);
+annotation('textbox','position',[0 0 1 1],'edgecolor','None','HorizontalAlignment','center','string',args.title);
 
 end
 
