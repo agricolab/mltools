@@ -1,0 +1,8 @@
+FILES=$(ls circ_*)
+for file in $FILES; 
+do
+    sed -i -e "s/circ_/circ./g" $file;
+    sed -i '0,/circ./{s/circ.//}' $file;
+    mv $file "${file/circ_/}"; 
+done
+
